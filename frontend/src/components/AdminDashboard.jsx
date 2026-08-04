@@ -401,10 +401,14 @@ const AdminDashboard = () => {
                   </td>
                 </tr>
               ) : (
-                displayedSales.map((sale) => (
+                displayedSales.map((sale, index) => (
                   <tr
                     key={sale.id}
-                    className="hover:bg-gray-50 transition-colors"
+                    className={`transition-colors ${
+                      index % 2 === 0
+                        ? "bg-white hover:bg-gray-50"
+                        : "bg-gray-50 hover:bg-gray-100"
+                    }`}
                   >
                     <td className="px-5 py-4 text-sm font-medium text-primary-600">
                       #{sale.id}
