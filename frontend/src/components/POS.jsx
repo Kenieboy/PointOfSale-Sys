@@ -274,6 +274,9 @@ const POS = () => {
           })),
           totalAmount: parseFloat(totalAmount.toFixed(2)),
           paymentMethod,
+          cashReceived:
+            paymentMethod === "cash" ? parseFloat(cashReceived) || 0 : null,
+          changeAmount: paymentMethod === "cash" ? change : null,
         },
         getAuthHeaders(),
       );
@@ -313,37 +316,84 @@ const POS = () => {
     getAuthHeaders,
   ]);
 
+  // Direct print — no preview window, straight to system print dialog
   const handlePrint = useCallback(() => {
-    const printContent = receiptRef.current.innerHTML;
-    const printWindow = window.open("", "_blank", "width=400,height=600");
-    printWindow.document.write(`
+    const receiptHTML = receiptRef.current.innerHTML;
+
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "1px";
+    iframe.style.height = "1px";
+    iframe.style.opacity = "0";
+    iframe.style.pointerEvents = "none";
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(`
+      <!DOCTYPE html>
       <html>
         <head>
           <title>Receipt #${saleResult?.saleId}</title>
           <style>
-            body { font-family: 'Courier New', monospace; font-size: 13px; margin: 0; padding: 20px; color: #000; }
-            .receipt { max-width: 320px; margin: 0 auto; }
+            @page { margin: 0; size: 80mm auto; }
+            body {
+              font-family: 'Courier New', Courier, monospace;
+              font-size: 13px;
+              margin: 0;
+              padding: 8px;
+              color: #000;
+              width: 80mm;
+            }
+            .receipt { width: 100%; }
             .center { text-align: center; }
-            .divider { border-top: 1px dashed #000; margin: 8px 0; }
-            .row { display: flex; justify-content: space-between; margin: 4px 0; }
+            .divider {
+              border-top: 1px dashed #000;
+              margin: 6px 0;
+            }
+            .row {
+              display: flex;
+              justify-content: space-between;
+              margin: 3px 0;
+            }
             .bold { font-weight: bold; }
-            .total { font-size: 16px; font-weight: bold; margin-top: 8px; }
-            .change-box { border: 1px solid #000; padding: 8px; margin-top: 8px; }
-            .denom-row { display: flex; justify-content: space-between; font-size: 12px; }
-            @media print { body { padding: 0; } }
+            .total {
+              font-size: 15px;
+              font-weight: bold;
+              margin-top: 6px;
+            }
+            .change-box {
+              border: 1px solid #000;
+              padding: 6px;
+              margin-top: 6px;
+            }
+            .denom-row {
+              display: flex;
+              justify-content: space-between;
+              font-size: 11px;
+            }
           </style>
         </head>
         <body>
-          <div class="receipt">${printContent}</div>
+          <div class="receipt">
+            ${receiptHTML}
+          </div>
         </body>
       </html>
     `);
-    printWindow.document.close();
-    printWindow.focus();
+    doc.close();
+
     setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 250);
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+      }, 1000);
+    }, 100);
   }, [saleResult]);
 
   const closeCheckout = useCallback(() => {
@@ -623,11 +673,21 @@ const POS = () => {
       {/* Notification Toast */}
       {message && (
         <div
-          className="fixed bottom-6 right-6 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg cursor-pointer animate-slideIn z-50"
+          className={`fixed bottom-6 right-6 px-6 py-3 rounded-lg shadow-lg cursor-pointer animate-slideIn z-50 ${
+            message.includes("❌") ||
+            message.includes("Error") ||
+            message.includes("Insufficient")
+              ? "bg-red-500"
+              : "bg-green-500"
+          } text-white`}
           onClick={() => setMessage("")}
         >
           <div className="flex items-center gap-2">
-            <span>✅</span>
+            <span>
+              {message.includes("❌") || message.includes("Error")
+                ? "⚠️"
+                : "✅"}
+            </span>
             <span className="font-medium">{message}</span>
           </div>
         </div>

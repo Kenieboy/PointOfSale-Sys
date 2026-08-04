@@ -103,6 +103,31 @@ const getSaleById = async (id) => {
   return rows[0] || null;
 };
 
+const getSaleWithItems = async (saleId) => {
+  const [saleRows] = await pool.query(
+    `SELECT s.*, u.name as cashier_name
+     FROM sales s
+     JOIN users u ON s.user_id = u.id
+     WHERE s.id = ?`,
+    [saleId],
+  );
+
+  if (saleRows.length === 0) return null;
+
+  const [itemRows] = await pool.query(
+    `SELECT si.*, p.name as product_name
+     FROM sale_items si
+     JOIN products p ON si.product_id = p.id
+     WHERE si.sale_id = ? AND si.voided = 0`,
+    [saleId],
+  );
+
+  return {
+    ...saleRows[0],
+    items: itemRows,
+  };
+};
+
 export {
   createSale,
   addSaleItem,
@@ -110,4 +135,5 @@ export {
   voidItem,
   getTodaySales,
   getSaleById,
+  getSaleWithItems,
 };

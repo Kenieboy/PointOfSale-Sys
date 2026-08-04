@@ -23,11 +23,24 @@ CREATE TABLE products (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Sales table
+-- Sales table V1
+-- CREATE TABLE sales (
+--   id INT AUTO_INCREMENT PRIMARY KEY,
+--   user_id INT NOT NULL,
+--   total_amount DECIMAL(10,2) NOT NULL,
+--   payment_method ENUM('cash', 'card', 'digital') DEFAULT 'cash',
+--   status ENUM('completed', 'refunded', 'cancelled') DEFAULT 'completed',
+--   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--   FOREIGN KEY (user_id) REFERENCES users(id)
+-- );
+
+-- Sales table V2
 CREATE TABLE sales (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   total_amount DECIMAL(10,2) NOT NULL,
+  cash_received DECIMAL(10,2) DEFAULT NULL,
+  change_amount DECIMAL(10,2) DEFAULT NULL,
   payment_method ENUM('cash', 'card', 'digital') DEFAULT 'cash',
   status ENUM('completed', 'refunded', 'cancelled') DEFAULT 'completed',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

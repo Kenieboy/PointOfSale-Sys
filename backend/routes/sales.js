@@ -1,15 +1,12 @@
-// const express = require('express');
-// const router = express.Router();
-// const { authenticate } = require('../middleware/auth');
-// const saleController = require('../controllers/saleController');
-
 import express from "express";
-const router = express.Router();
 import { authenticate } from "../middleware/auth.js";
-import saleController from "../controllers/saleController.js";
+import * as saleController from "../controllers/saleController.js";
+
+const router = express.Router();
 
 router.post("/", authenticate, saleController.createSale);
 router.post("/void-item", authenticate, saleController.voidItem);
 router.get("/today", authenticate, saleController.getTodaySales);
+router.get("/:id", authenticate, saleController.getSaleDetails);
 
 export default router;
