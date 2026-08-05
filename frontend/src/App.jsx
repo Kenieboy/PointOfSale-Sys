@@ -5,20 +5,19 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { SettingsProvider } from "./context/SettingsContext";
 import Login from "./components/Login";
 import POS from "./components/POS";
 import AdminDashboard from "./components/AdminDashboard";
 import Reports from "./components/Reports";
-import Navbar from "./components/Navbar";
 import Settings from "./components/Settings";
-import { SettingsProvider } from "./context/SettingsContext";
+import Navbar from "./components/Navbar";
 
 const PrivateRoute = ({ children, adminOnly }) => {
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const { user } = useAuth();
 
-  if (!token) return <Navigate to="/login" />;
+  if (!user) return <Navigate to="/login" />;
   if (adminOnly && user.role !== "admin") return <Navigate to="/pos" />;
 
   return (

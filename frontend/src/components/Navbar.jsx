@@ -15,6 +15,11 @@ const Navbar = () => {
         : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
     }`;
 
+  const handleLogout = async () => {
+    await logout();
+    window.location.href = "/login"; // Hard redirect to clear any state
+  };
+
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,7 +67,7 @@ const Navbar = () => {
             </div>
 
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="text-sm font-medium text-red-600 hover:text-red-700 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors"
             >
               Logout
