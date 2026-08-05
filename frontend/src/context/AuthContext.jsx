@@ -1,8 +1,14 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  use,
+} from "react";
 import axios from "axios";
 
 // Tell axios to always send cookies with requests
-//axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = true;
 
 const AuthContext = createContext(null);
 
@@ -23,7 +29,7 @@ export const AuthProvider = ({ children }) => {
       }
     };
     checkAuth();
-  }, []);
+  });
 
   const login = async (username, password) => {
     const response = await axios.post("/api/auth/login", {

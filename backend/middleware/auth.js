@@ -33,6 +33,22 @@ const authenticate = async (req, res, next) => {
   }
 };
 
+// const authenticate = (req, res, next) => {
+//   const token = req.cookies?.token; // req.cookies is undefined without cookie-parser!
+
+//   if (!token) {
+//     return res.status(401).json({ message: "Unauthorized" });
+//   }
+
+//   try {
+//     const decoded = jwt.verify(token, JWT_SECRET);
+//     req.user = decoded; // This is what your `me` controller uses
+//     next();
+//   } catch (error) {
+//     return res.status(401).json({ message: "Invalid token" });
+//   }
+// };
+
 const authorizeAdmin = (req, res, next) => {
   if (req.user?.role !== "admin") {
     return res.status(403).json({ message: "Access denied. Admin only." });

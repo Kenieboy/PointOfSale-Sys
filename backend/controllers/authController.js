@@ -5,9 +5,10 @@ import * as User from "../models/User.js";
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production", // HTTPS only in production
-  sameSite: "strict",
-  maxAge: 8 * 60 * 60 * 1000, // 8 hours
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax", // lax is safer for dev proxy
+  path: "/api", // ✅ CRITICAL: cookie available on ALL routes
+  maxAge: 8 * 60 * 60 * 1000,
 };
 
 const login = async (req, res) => {
@@ -47,7 +48,7 @@ const login = async (req, res) => {
 };
 
 const logout = (req, res) => {
-  res.clearCookie("token", { httpOnly: true, sameSite: "strict" });
+  res.clearCookie("token", COOKIE_OPTIONS);
   res.json({ message: "Logged out successfully" });
 };
 
